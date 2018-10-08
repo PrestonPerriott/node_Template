@@ -1,15 +1,15 @@
 'use strict'
 
 var express  = require('express')
-var route = express.Router()
+var router = express.Router()
 //TODO: Build Mongoose DB 
 
 /// Routes we want to exclude 
 var routeExclusion = [
-    'api/login',
-    'api/register',
-    'api/refresh',
-    'api/version'
+    '/api/login',
+    '/api/register',
+    '/api/refresh',
+    '/api/version'
 ]
 
 /// What we wanna do for all paths
@@ -24,7 +24,8 @@ router.all('*', function(req, res, next) {
         }
     }
 
-    if (willExclude) {
+    if (willExclude === true) {
+        console.log('Exclusion url hit')
         return next()
     }
 
@@ -34,3 +35,6 @@ router.all('*', function(req, res, next) {
         throw new Error("No Auth Token")
     }
 })
+
+module.exports = router
+

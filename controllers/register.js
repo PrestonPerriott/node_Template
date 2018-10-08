@@ -3,6 +3,15 @@
 var express =  require('express')
 var router = express.Router()
 
+//include our UserSchema
+var User = require('../models/user')
+
+router.get ('/', function(req, res, next) {
+    res.send('This stuff')
+    console.log('hit get register')
+    next()
+})
+
 router.post('/', function(req, res, next){ 
     var username = req.body.username
     var password = req.body.password
@@ -30,12 +39,20 @@ router.post('/', function(req, res, next){
     if (valErrors) {
 
     } else {
-        console.log('Creating User')
-
-        /// TODO: Our User Model doesn't exist yet...
+        console.log('Creating User...')
         var newUser = new User({
+            username: username,
+            password: password,
+            email: email,
+            date: Date.now()
+        })
 
+        User.createUser(newUser, function(err, user){
+            if (err) throw err
+            console.log('Finished creating user: ' + user)
         })
     }
 
 })
+
+module.exports = router
