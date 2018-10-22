@@ -30,14 +30,37 @@ var UserSchema = mongoose.Schema({
 var User = module.exports = mongoose.model('User', UserSchema)
 
 ///create user func 
-module.exports.createUser = function(newUser, cb) {
+module.exports.createUser = async (newUser) => {
 
-    ///hash pword
-    bcrypt.genSalt(10, function(err, salt) {
-        bcrypt.hash(newUser.password, salt, function(err, hash) {
-            ///store pword
-            newUser.password = hash
-            newUser.save(cb)
-        }) 
-    })
+    var user = null
+    console.log('Attempting to save user...')
+
+    let encryption = await bcrypt.genSalt(10) 
+    let hash = await bcrypt.hash(newUser.password, encryption)
+    newUser.password = hash
+    user = await newUser.save()
+    console.log('User successfully saved')
+    return user
+}
+
+module.exports.userByUserName = async function(username) { 
+
+    var search = {username : username}
+    var foundUser = null
+    foundUser = await User.findOne(search)
+    return foundUser
+}
+
+module.exports.userByEmail = async function(email) {
+
+    var search = {email : email}
+    var foundUser = null
+    foundUser = await User.findOne(search)
+    return foundUser
+}
+
+module.exports.comparePassword = async function(password, hash) {
+
+    let comparison = await bcrypt.compare(password, hash)
+    return comparison
 }

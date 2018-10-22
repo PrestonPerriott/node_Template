@@ -1,6 +1,7 @@
 'use strict'
 
 const express = require('express')
+const validator = require('express-validator')
 const mongodb = require('mongodb')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
@@ -14,9 +15,11 @@ var app = express()
 
 dotenv.config()
 
-var uri = process.env.DB_HOST + ':' + process.env.DB_PORT + '/' + process.env.DB_DBNAME
-var db = monk(uri)
+var uri = 'mongodb://' + process.env.DB_HOST + ':' + process.env.DB_PORT + '/' + process.env.DB_DBNAME
+mongoose.connect(uri, { useNewUrlParser: true })
+var db = mongoose.connection
 
+app.use(validator())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
     extended: false
