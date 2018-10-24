@@ -23,6 +23,11 @@ var UserSchema = mongoose.Schema({
         type: Date,
         default: Date.now,
         require: true
+    },
+
+    accessToken: {
+        type: String,
+        default: '',
     }
 })
 
@@ -63,4 +68,10 @@ module.exports.comparePassword = async function(password, hash) {
 
     let comparison = await bcrypt.compare(password, hash)
     return comparison
+}
+
+module.exports.stripToJSON = async function(user) {
+    var obj = user.toObject()
+    await delete obj['password']
+    return obj
 }
