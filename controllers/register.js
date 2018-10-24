@@ -7,9 +7,16 @@ var router = express.Router()
 var User = require('../models/user')
 var Auth = require('../microservices/jwt-auth')
 
-router.get ('/', function(req, res, next) {
+///temp
+var Recipe = require('../microservices/recipe-handler.js')
+
+router.get ('/', async function(req, res, next) {
     res.send('This stuff')
     console.log('hit get register')
+    let recipes = await Recipe.fetchRecipesFromCategory('kosher')
+    recipes.forEach(function(recipe){
+        console.log(recipe)
+    })
     next()
 })
 
@@ -24,10 +31,12 @@ router.post('/', async function(req, res, next){
     var existingEmail = ''    
 
     var matched = false
-
-    req.checkBody('username', 'Name Required').notEmpty()
-    req.checkBody('password', 'Pass Required').notEmpty()
-    req.checkBody('email', 'A valid email is required').isEmail()
+    
+    req.checkBody('username', 'Name is required').notEmpty(); 
+	req.checkBody('password', 'A password is required').notEmpty(); 
+	//req.checkBody('repPass', 'The Passwords do not match').equals(req.body.password);
+	req.checkBody('email', 'An email is required').notEmpty();
+	req.checkBody('email', 'A valid email is required').isEmail();
 
     try {
         existingUsername = await User.userByUserName(username)
@@ -48,10 +57,14 @@ router.post('/', async function(req, res, next){
         throw 'Error email exists'
     }
 
+
     var valErrors = req.validationErrors()
+    var newValErr = await req.getValidationResult()
+    console.log('Our Validation result contains : ' + newValErr)
 
     if (valErrors) {
-        console.log('There were validation errors')
+        console.log('There were validation errors \n')
+        console.log('Stemming from the request : ' + JSON.stringify(req.body))
         throw valErrors
     } else {
         console.log('Creating User...')
@@ -59,7 +72,8 @@ router.post('/', async function(req, res, next){
             username: username,
             password: password,
             email: email,
-            date: Date.now()
+            date: Date.now(),
+            accessToken: ''
         })
 
         try {
@@ -73,11 +87,10 @@ router.post('/', async function(req, res, next){
         if (matched) {
             var token = null
             token = await Auth.tokenize(validUser)
-            res.json({
-               message : 'Logged in Successfully',
-               token :  token
-            })
-
+            validUser.accessToken = token
+            await validUser.save()
+            let returnedUser = await User.stripToJSON(validUser)
+            res.send(returnedUser)
         }
     }
 
