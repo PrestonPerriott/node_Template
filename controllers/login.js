@@ -46,12 +46,16 @@ router.post('/', async function(req, res, next){
                     res.send(returnedUser)
                 } else {
                     ///TODO: If the password doesn't match
+                    console.log('password Mismatch')
+                    res.status(401).send({'error': 'Mismatched Password'})
                 }
             } else {
-                res.status(401).send('There is no user with that email')
+                console.log("Email Doesn't exist")
+                res.status(401).send({'error':'There is no user with that email'})
             }
         } catch (err) {
-            res.status(400).send('Interaction error with the db')
+            console.log('Failed to interact with DB')
+            res.status(400).send({'error':'Interaction error with the db'})
         }
     }
 

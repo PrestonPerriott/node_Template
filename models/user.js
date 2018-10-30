@@ -24,6 +24,11 @@ var UserSchema = mongoose.Schema({
         default: Date.now,
         require: true
     },
+    
+    previousCategory: {
+        type: String,
+        require: false
+    },
 
     accessToken: {
         type: String,

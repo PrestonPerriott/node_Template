@@ -21,7 +21,7 @@ module.exports = {
     var obj = await fetch(dailyRecipesUrl)
     var json = await obj.json()
     var hits = json['hits']
-    
+
     hits.forEach(function(hit){
         console.log('Our recipes labels inside our hit : ' + hit['recipe'].label)
         
@@ -35,13 +35,13 @@ module.exports = {
         })
 
         RecipesArray.push({
-            title: hit['recipe'].label,
-            url: hit['recipe'].url,
-            image: hit['recipe'].image,
-            calories: hit['recipe'].calories,
-            totalTime: hit['recipe'].totalTime,
-            category: categories,
-            ingredients: ingredients
+            'title': hit['recipe'].label,
+            'url': hit['recipe'].url,
+            'image': hit['recipe'].image,
+            'calories': hit['recipe'].calories,
+            'totalTime': hit['recipe'].totalTime,
+            'category': categories,
+            'ingredients': ingredients
         })
 
         ingredients = []

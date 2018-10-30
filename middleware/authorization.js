@@ -2,6 +2,8 @@
 
 var express  = require('express')
 var router = express.Router()
+var passport = require('passport')
+var Auth = require('../microservices/jwt-auth')
 //TODO: Build Mongoose DB 
 
 /// Routes we want to exclude 
@@ -28,12 +30,16 @@ router.all('*', function(req, res, next) {
         console.log('Exclusion url hit')
         return next()
     }
-
-    /// If this value isn't in the request throw an error
-    /// TODO: Make custom Error Class
-    if (!req.get('Authorization')) {
-        throw new Error("No Auth Token")
-    }
+    passport.use(Auth.jwtStrategy)
+    passport.authenticate('jwt', {
+        successRedirect: next(),
+        failureRedirect: res.status(400).send({'error' : 'JWT Authentication failed'})
+    })
+    // /// If this value isn't in the request throw an error
+    // /// TODO: Make custom Error Class
+    // if (!req.get('Authorization')) {
+    //     throw new Error("No Auth Token")
+    // }
 })
 
 module.exports = router

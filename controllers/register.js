@@ -72,6 +72,7 @@ router.post('/', async function(req, res, next){
             username: username,
             password: password,
             email: email,
+            previousCategory: '',
             date: Date.now(),
             accessToken: ''
         })
