@@ -10,6 +10,8 @@ router.use('/api/version', require('./version'))
 
 router.use('/api/login', require('./login'))
 router.use('/api/refresh', require('./refresh'))
+router.use('/api/home', require('./home'))
+
 
 module.exports = router
 

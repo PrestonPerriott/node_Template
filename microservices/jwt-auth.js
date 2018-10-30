@@ -24,7 +24,7 @@ module.exports.tokenize = async function(user) {
 }
 
 module.exports.jwtStrategy = new strategyJWT(jwtOptions, function(jwtRes, next) {
-    console.log('The Json web token is :', jwtRes)
+    console.log('***Strategy*** The Json web token is :', jwtRes)
     User.userByUserName(jwtRes.username, function(err, user){
         if (err) {
             return next(err, false)
