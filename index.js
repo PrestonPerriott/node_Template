@@ -10,6 +10,7 @@ const session =  require('express-session')
 const passport = require('passport')
 const monk = require('monk')
 var dotenv = require('dotenv')
+var Auth = require('./microservices/jwt-auth')
 
 var app = express()
 
@@ -40,6 +41,7 @@ app.use(session({
 
 app.use(passport.initialize())
 app.use(passport.session())
+passport.use(Auth.jwtStrategy)
 
 app.use(require('./middleware'))
 app.use(require('./controllers'))

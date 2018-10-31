@@ -8,10 +8,14 @@ var strategyJWT = passportJWT.Strategy
 
 var jwtOptions = {}
 jwtOptions.secretOrKey = process.env.JWT_SECRET
-jwtOptions.jwtFromRequest = async function(req) {
+jwtOptions.jwtFromRequest = function(req) {
+    console.log('Fetching token...')
     var token = null
-    if (req && req.headers) {
-        token = req.headers['Authorization']
+    try {
+        token = req.get('authorization') 
+    } catch (err) {
+        console.log('Error getting token from Headers')
+        throw err
     }
     return token
 }
@@ -23,16 +27,13 @@ module.exports.tokenize = async function(user) {
     return token
 }
 
-module.exports.jwtStrategy = new strategyJWT(jwtOptions, function(jwtRes, next) {
+module.exports.jwtStrategy = new strategyJWT(jwtOptions, async function(jwtRes, next) {
     console.log('***Strategy*** The Json web token is :', jwtRes)
-    User.userByUserName(jwtRes.username, function(err, user){
-        if (err) {
-            return next(err, false)
-        } 
-        if (user) {
-            next(null, user)
-        } else {
-            next(null, false)
-        }
-    })
+    try {
+        let authUser = await User.userByUserName(jwtRes.name)
+        return next(null, authUser)
+    } catch (err) {
+        console.log('Error from the stratgey is : ' + err)
+        return next(err, null)
+    }
 })

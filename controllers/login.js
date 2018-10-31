@@ -7,7 +7,7 @@ var router = express.Router()
 var User = require('../models/user')
 var Auth = require('../microservices/jwt-auth')
 
-router.get ('/', function(res, next) {
+router.get ('/', function(req, res, next) {
     res.send('This stuff')
     console.log('hit get login')
     next()
