@@ -44,6 +44,8 @@ app.use(passport.session())
 app.use(require('./middleware'))
 app.use(require('./controllers'))
 
+app.use(require('./middleware/error-handler'))
+
 /// Truthy vs Falsey values
 /// If it has a value it is a truthy value
 app.set('port', (process.env.PORT || 8080))
