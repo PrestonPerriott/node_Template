@@ -43,29 +43,38 @@ router.post('/', async function(req, res, next){
         existingEmail = await User.userByEmail(email)
     } catch (err) {
         console.log('There was an error connecting with the db for searching')
-        res.status(500).send(err)
-        throw err
+        next(err)
+        // res.status(500).send(err)
+        // throw err
     }
 
     if (existingUsername != null) {
-        console.log('Our error from existing user is : ' + existingUsername)
-        res.status(501).send('Username exists')
-        throw 'Error name exists'
+        console.log(existingUsername.username + ' Already exists as a username\n' )
+        var err = new Error()
+        err.statusCode = 401
+        err.message = 'Username already exists'
+        return next(err)
+        // res.status(501).send('Username exists')
+        // throw 'Error name exists'
     } else if (existingEmail != null) {
-        console.log('Our error from existing email is : ' + existingEmail)
-        res.status(501).send('Email exists')
-        throw 'Error email exists'
+        console.log(existingEmail.email + ' Already exists as an email\n')
+        var err = new Error()
+        err.statusCode = 401
+        err.message = 'Email Already exists'
+        return next(err)
+        // res.status(501).send('Email exists')
+        // throw 'Error email exists'
     }
-
 
     var valErrors = req.validationErrors()
     var newValErr = await req.getValidationResult()
-    console.log('Our Validation result contains : ' + newValErr)
 
-    if (valErrors) {
-        console.log('There were validation errors \n')
-        console.log('Stemming from the request : ' + JSON.stringify(req.body))
-        throw valErrors
+    if (valErrors || newValErr) {
+        console.log('There were validation errors')
+        console.log('Stemming from the request : ' + JSON.stringify(req.body) + '\n')
+        console.log('The validation errors are : ' + valErrors + '\n')
+        console.log('Getting Validation result : ' + newValErr.array() + '\n')
+        next(valErrors)
     } else {
         console.log('Creating User...')
         var newUser = new User({
@@ -82,7 +91,8 @@ router.post('/', async function(req, res, next){
             validUser = await User.userByUserName(user.username)
             matched = await User.comparePassword(req.body.password, validUser.password)
         } catch (err) {
-            res.status(400).send('Interaction error with the db')
+            next(err)
+            //res.status(400).send('Interaction error with the db')
         }
 
         if (matched) {
